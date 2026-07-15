@@ -26,3 +26,11 @@ class GreetingScreenshotTest {
     composeTestRule.onRoot().captureRoboImage(filePath = "src/test/screenshots/greeting.png")
   }
 }
+
+@androidx.compose.runtime.Composable
+fun Greeting(name: String) {
+  androidx.compose.material3.Text(
+    text = "Hello, $name!",
+    style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+  )
+}
