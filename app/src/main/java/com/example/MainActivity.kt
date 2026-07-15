@@ -34,6 +34,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.example.ui.theme.*
 import com.example.ui.viewmodel.MainViewModel
 import com.example.data.*
@@ -55,6 +58,273 @@ enum class TransitionType {
     PUSH,
     PUSH_BACK,
     SLIDE_UP
+}
+
+@Composable
+fun NeumorphicIcon(
+    imageVector: ImageVector,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    iconSize: Dp = 24.dp,
+    tint: Color = OnBackgroundColor,
+    containerColor: Color = PureWhite,
+    shape: androidx.compose.ui.graphics.Shape = CircleShape,
+    isSunken: Boolean = false,
+    elevation: Dp = 4.dp
+) {
+    Box(
+        modifier = modifier
+            .size(iconSize + 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (!isSunken) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = -elevation, y = -elevation)
+                    .background(
+                        color = PureWhite.copy(alpha = 0.95f),
+                        shape = shape
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = elevation, y = elevation)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.08f),
+                        shape = shape
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = containerColor,
+                        shape = shape
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black.copy(alpha = 0.02f),
+                        shape = shape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = contentDescription,
+                    tint = tint,
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = containerColor,
+                        shape = shape
+                    )
+                    .border(
+                        width = 1.5.dp,
+                        color = Color.Black.copy(alpha = 0.06f),
+                        shape = shape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(1.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.05f),
+                            shape = shape
+                        )
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(3.dp)
+                        .background(
+                            color = containerColor,
+                            shape = shape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = imageVector,
+                        contentDescription = contentDescription,
+                        tint = tint,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StickyNote(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color,
+    pinColor: Color = Color.Red,
+    title: String,
+    content: String,
+    icon: ImageVector
+) {
+    Box(
+        modifier = modifier
+            .padding(top = 16.dp, bottom = 8.dp)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer(
+                    rotationZ = if (title.contains("Concept", ignoreCase = true)) -1.5f else 1.5f
+                ),
+            colors = CardDefaults.cardColors(containerColor = backgroundColor),
+            shape = RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 24.dp, topStart = 4.dp, topEnd = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 24.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = OnBackgroundColor.copy(alpha = 0.8f),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = title,
+                        fontFamily = PlusJakartaSans,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = OnBackgroundColor
+                    )
+                }
+                Text(
+                    text = content,
+                    fontFamily = BeVietnamPro,
+                    fontSize = 14.sp,
+                    color = OnBackgroundColor.copy(alpha = 0.85f),
+                    lineHeight = 20.sp
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = (-8).dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .offset(x = 4.dp, y = 12.dp)
+                    .background(Color.Black.copy(alpha = 0.25f), shape = CircleShape)
+            )
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                pinColor.copy(alpha = 0.9f),
+                                pinColor,
+                                pinColor.copy(alpha = 0.8f)
+                            )
+                        ),
+                        shape = CircleShape
+                    )
+                    .border(1.5.dp, PureWhite.copy(alpha = 0.5f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .align(Alignment.TopStart)
+                        .offset(x = 4.dp, y = 4.dp)
+                        .background(PureWhite.copy(alpha = 0.6f), shape = CircleShape)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NeumorphicButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    containerColor: Color = PureWhite,
+    contentColor: Color = OnBackgroundColor,
+    isSunken: Boolean = false,
+    elevation: Dp = 4.dp,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(16.dp),
+    content: @Composable RowScope.() -> Unit
+) {
+    val scaleFactor by animateFloatAsState(targetValue = if (isSunken) 0.98f else 1.0f)
+
+    Box(
+        modifier = modifier
+            .graphicsLayer(scaleX = scaleFactor, scaleY = scaleFactor)
+            .clickable(
+                enabled = enabled,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        if (enabled && !isSunken) {
+            // Light top-left shadow
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = -elevation, y = -elevation)
+                    .background(
+                        color = PureWhite.copy(alpha = 0.9f),
+                        shape = shape
+                    )
+            )
+            // Dark bottom-right shadow
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .offset(x = elevation, y = elevation)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.08f),
+                        shape = shape
+                    )
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .background(
+                    color = if (enabled) containerColor else containerColor.copy(alpha = 0.5f),
+                    shape = shape
+                )
+                .border(
+                    width = 1.dp,
+                    color = Color.Black.copy(alpha = 0.02f),
+                    shape = shape
+                )
+                .padding(horizontal = 24.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            content()
+        }
+    }
 }
 
 class MainActivity : ComponentActivity() {
@@ -302,51 +572,53 @@ fun BottomNavBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(PureWhite)
+            .background(BackgroundColor)
             .border(
                 width = 2.dp,
                 color = NeutralGray,
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.CenterVertically
     ) {
         items.forEach { item ->
             val isActive = currentScreen == item.screen
-            val scaleFactor by animateFloatAsState(targetValue = if (isActive) 1.05f else 1.0f)
+            val scaleFactor by animateFloatAsState(targetValue = if (isActive) 1.08f else 1.0f)
 
-            Button(
-                onClick = { onNavigate(item.screen) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isActive) PrimaryGreen else Color.Transparent,
-                    contentColor = if (isActive) OnPrimary else OnBackgroundColor
-                ),
-                shape = RoundedCornerShape(12.dp),
-                elevation = null,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+            Box(
                 modifier = Modifier
-                    .testTag("nav_btn_${item.label}")
                     .weight(1f)
-                    .semantics { contentDescription = item.label }
-                    .padding(horizontal = 2.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onNavigate(item.screen) }
+                    )
+                    .testTag("nav_btn_${item.label}")
+                    .padding(horizontal = 4.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.graphicsLayer(scaleX = scaleFactor, scaleY = scaleFactor)
                 ) {
-                    Icon(
+                    NeumorphicIcon(
                         imageVector = item.icon,
                         contentDescription = item.label,
-                        tint = if (isActive) OnPrimary else NeutralGrayDark,
-                        modifier = Modifier.size(24.dp)
+                        iconSize = 24.dp,
+                        tint = if (isActive) PrimaryGreen else NeutralGrayDark,
+                        containerColor = if (isActive) SlateGrayLow else PureWhite,
+                        isSunken = isActive,
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = if (isActive) 2.dp else 4.dp
                     )
                     Text(
                         text = item.label,
                         fontFamily = BeVietnamPro,
                         fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 11.sp,
-                        color = if (isActive) OnPrimary else NeutralGrayDark,
+                        color = if (isActive) PrimaryGreenDark else NeutralGrayDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -482,19 +754,16 @@ fun HomeScreen(
                     }
 
                     // Generate Learning Path Button
-                    Button(
+                    NeumorphicButton(
                         onClick = { viewModel.generateLearningPath(searchTopicQuery) },
                         enabled = !isGeneratingPath && searchTopicQuery.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryGreen,
-                            disabledContainerColor = PrimaryGreen.copy(alpha = 0.5f)
-                        ),
+                        containerColor = PrimaryGreen,
+                        contentColor = OnPrimary,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .testTag("generate_path_button"),
-                        contentPadding = PaddingValues(0.dp)
+                            .testTag("generate_path_button")
                     ) {
                         if (isGeneratingPath) {
                             CircularProgressIndicator(
@@ -506,9 +775,13 @@ fun HomeScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
+                                NeumorphicIcon(
                                     imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = "Sparkles"
+                                    contentDescription = "Sparkles",
+                                    tint = OnPrimary,
+                                    containerColor = PrimaryGreenDark,
+                                    iconSize = 18.dp,
+                                    elevation = 2.dp
                                 )
                                 Text(
                                     text = "GENERATE LEARNING PATH",
@@ -543,20 +816,16 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(SecondaryContainerBlue),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (activePath != null) Icons.Default.AutoAwesome else Icons.Default.Terminal,
-                            contentDescription = "Subject Icon",
-                            tint = SecondaryBlue,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    NeumorphicIcon(
+                        imageVector = if (activePath != null) Icons.Default.AutoAwesome else Icons.Default.Terminal,
+                        contentDescription = "Subject Icon",
+                        iconSize = 32.dp,
+                        tint = SecondaryBlue,
+                        containerColor = SecondaryContainerBlue,
+                        isSunken = false,
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = 4.dp
+                    )
 
                     Column(
                         modifier = Modifier.weight(1f),
@@ -1407,7 +1676,7 @@ fun AITutorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 listOf(
                     AITutorChip("Explain differently", Icons.Default.Autorenew),
@@ -1416,7 +1685,7 @@ fun AITutorScreen(
                     AITutorChip("ELI5", Icons.Default.ChildCare)
                 ).forEach { chip ->
                     val isQuizMe = chip.label == "Quiz me"
-                    Button(
+                    NeumorphicButton(
                         onClick = {
                             if (isQuizMe) {
                                 onNavigate(Screen.QUIZ)
@@ -1424,15 +1693,12 @@ fun AITutorScreen(
                                 viewModel.triggerQuickAction(chip.label)
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PureWhite,
-                            contentColor = PrimaryGreenDark
-                        ),
+                        containerColor = PureWhite,
+                        contentColor = PrimaryGreenDark,
                         shape = RoundedCornerShape(9999.dp),
-                        border = BorderStroke(2.dp, OutlineGray),
+                        elevation = 2.dp,
                         modifier = Modifier
-                            .testTag(if (isQuizMe) "quiz_me_button" else "chip_${chip.label}"),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                            .testTag(if (isQuizMe) "quiz_me_button" else "chip_${chip.label}")
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -1448,7 +1714,8 @@ fun AITutorScreen(
                                 text = chip.label,
                                 fontFamily = BeVietnamPro,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                color = OnBackgroundColor
                             )
                         }
                     }
@@ -1492,22 +1759,23 @@ fun AITutorScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    Button(
+                    NeumorphicButton(
                         onClick = {
                             if (messageInput.isNotBlank()) {
                                 viewModel.sendChatMessage(messageInput)
                                 messageInput = ""
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                        containerColor = PrimaryGreen,
+                        contentColor = OnPrimary,
                         shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.size(40.dp),
-                        contentPadding = PaddingValues(0.dp)
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Send,
                             contentDescription = "Send message",
-                            tint = OnPrimary
+                            tint = OnPrimary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -1881,13 +2149,13 @@ fun LearningPathGeneratorScreen(
                         }
                     }
 
-                    Button(
+                    NeumorphicButton(
                         onClick = { viewModel.addGeneratedPathToTree() },
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                        containerColor = PrimaryGreen,
+                        contentColor = OnPrimary,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
-                            .testTag("add_to_tree_button"),
-                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+                            .testTag("add_to_tree_button")
                     ) {
                         Text(
                             text = "ADD TO MY TREE",
@@ -2028,14 +2296,14 @@ fun LearningPathGeneratorScreen(
                                                 overflow = TextOverflow.Ellipsis
                                             )
 
-                                            Button(
+                                            NeumorphicButton(
                                                 onClick = { viewModel.selectLesson(lesson) },
-                                                colors = ButtonDefaults.buttonColors(containerColor = SlateGrayHigh, contentColor = OnBackgroundColor),
+                                                containerColor = SlateGrayHigh,
+                                                contentColor = OnBackgroundColor,
                                                 shape = RoundedCornerShape(8.dp),
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .testTag("start_lesson_${lesson.lessonTitle.lowercase().replace(" ", "_")}"),
-                                                contentPadding = PaddingValues(vertical = 12.dp)
+                                                    .testTag("start_lesson_${lesson.lessonTitle.lowercase().replace(" ", "_")}")
                                             ) {
                                                 Text(
                                                     text = "Start Lesson",
@@ -2091,20 +2359,26 @@ fun QuizScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                onClick = { onNavigate(Screen.LESSON) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = NeutralGrayDark),
-                contentPadding = PaddingValues(0.dp),
+            Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .semantics { contentDescription = "Close Quiz" }
                     .testTag("quiz_close_button")
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onNavigate(Screen.LESSON) }
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "close",
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = NeutralGrayDark
+                NeumorphicIcon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close Quiz",
+                    iconSize = 24.dp,
+                    tint = NeutralGrayDark,
+                    containerColor = PureWhite,
+                    isSunken = false,
+                    shape = CircleShape,
+                    elevation = 4.dp
                 )
             }
 
@@ -2226,19 +2500,16 @@ fun QuizScreen(
                         else -> SlateGrayDim
                     }
 
-                    Button(
+                    NeumorphicButton(
                         onClick = { viewModel.selectQuizOption(idx) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = containerColor,
-                            contentColor = contentColor
-                        ),
+                        containerColor = containerColor,
+                        contentColor = contentColor,
                         shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, borderColor),
+                        isSunken = isSelected,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 4.dp)
-                            .testTag("quiz_option_$idx"),
-                        contentPadding = PaddingValues(20.dp)
+                            .testTag("quiz_option_$idx")
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -2299,7 +2570,7 @@ fun QuizScreen(
             val buttonText = if (quizAnswered) "CONTINUE" else "CHECK ANSWER"
             val buttonColor = if (quizAnswered || hasSelected) PrimaryGreen else SlateGrayDim
 
-            Button(
+            NeumorphicButton(
                 onClick = {
                     if (quizAnswered) {
                         viewModel.moveToNextLesson()
@@ -2308,12 +2579,8 @@ fun QuizScreen(
                     }
                 },
                 enabled = quizAnswered || hasSelected,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonColor,
-                    disabledContainerColor = SlateGrayLow,
-                    contentColor = OnPrimary,
-                    disabledContentColor = NeutralGrayDark
-                ),
+                containerColor = buttonColor,
+                contentColor = OnPrimary,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -2324,7 +2591,8 @@ fun QuizScreen(
                     text = buttonText,
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = if (quizAnswered || hasSelected) OnPrimary else NeutralGrayDark
                 )
             }
         }
@@ -2444,7 +2712,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // CTA Submit button
-                Button(
+                NeumorphicButton(
                     onClick = {
                         if (isSignUpMode) {
                             viewModel.signUp(email, password)
@@ -2453,7 +2721,8 @@ fun ProfileScreen(
                         }
                     },
                     enabled = email.isNotBlank() && password.length >= 6 && !isAuthLoading,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                    containerColor = PrimaryGreen,
+                    contentColor = OnPrimary,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -2479,14 +2748,22 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Toggle mode button
-                TextButton(
+                NeumorphicButton(
                     onClick = { isSignUpMode = !isSignUpMode },
-                    modifier = Modifier.testTag("auth_toggle_button")
+                    containerColor = SlateGray,
+                    contentColor = PrimaryGreen,
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .testTag("auth_toggle_button")
                 ) {
                     Text(
                         text = if (isSignUpMode) "Already have an account? Sign In" else "New to LearnTree? Create Account",
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
                         color = PrimaryGreen
                     )
                 }
@@ -2599,20 +2876,16 @@ fun ProfileScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(stat.bgColor),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = stat.icon,
-                                    contentDescription = stat.title,
-                                    tint = stat.iconColor,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
+                            NeumorphicIcon(
+                                imageVector = stat.icon,
+                                contentDescription = stat.title,
+                                iconSize = 24.dp,
+                                tint = stat.iconColor,
+                                containerColor = stat.bgColor,
+                                isSunken = false,
+                                shape = CircleShape,
+                                elevation = 3.dp
+                            )
                             Text(
                                 text = stat.title,
                                 fontFamily = PlusJakartaSans,
@@ -2746,20 +3019,16 @@ fun ProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(56.dp)
-                                        .clip(CircleShape)
-                                        .background(badge.color),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = badge.icon,
-                                        contentDescription = badge.name,
-                                        tint = PureWhite,
-                                        modifier = Modifier.size(36.dp)
-                                    )
-                                }
+                                NeumorphicIcon(
+                                    imageVector = badge.icon,
+                                    contentDescription = badge.name,
+                                    iconSize = 30.dp,
+                                    tint = PureWhite,
+                                    containerColor = badge.color,
+                                    isSunken = false,
+                                    shape = CircleShape,
+                                    elevation = 3.dp
+                                )
                                 Text(
                                     text = badge.name,
                                     fontFamily = BeVietnamPro,
@@ -2777,9 +3046,10 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
+                NeumorphicButton(
                     onClick = { viewModel.signOut() },
-                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                    containerColor = ErrorRed,
+                    contentColor = PureWhite,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -2886,19 +3156,26 @@ fun LessonScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                onClick = { onNavigate(Screen.HOME) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = NeutralGrayDark),
-                contentPadding = PaddingValues(0.dp),
+            Box(
                 modifier = Modifier
-                    .size(40.dp)
                     .semantics { contentDescription = "Close Lesson" }
                     .testTag("lesson_close_button")
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onNavigate(Screen.HOME) }
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
+                NeumorphicIcon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close Lesson",
-                    tint = NeutralGrayDark
+                    iconSize = 24.dp,
+                    tint = NeutralGrayDark,
+                    containerColor = PureWhite,
+                    isSunken = false,
+                    shape = CircleShape,
+                    elevation = 4.dp
                 )
             }
 
@@ -2948,11 +3225,15 @@ fun LessonScreen(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Icon(
+            NeumorphicIcon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "Lives / Health Icon",
+                iconSize = 24.dp,
                 tint = ErrorRed,
-                modifier = Modifier.size(28.dp)
+                containerColor = PureWhite,
+                isSunken = false,
+                shape = CircleShape,
+                elevation = 4.dp
             )
         }
 
@@ -3049,7 +3330,7 @@ fun LessonScreen(
                     )
                     Column {
                         Text(
-                            text = "AI Tip:",
+                            text = "Tip:",
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
@@ -3070,71 +3351,23 @@ fun LessonScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, NeutralGray, RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(containerColor = PureWhite),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Psychology,
-                            contentDescription = "Concept Icon",
-                            tint = PrimaryGreen,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text(
-                            text = "Key Concept",
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = OnBackgroundColor
-                        )
-                        Text(
-                            text = keyConcept,
-                            fontFamily = BeVietnamPro,
-                            fontSize = 14.sp,
-                            color = NeutralGrayDark
-                        )
-                    }
-                }
+                StickyNote(
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = Color(0xFF17C0E9),
+                    pinColor = Color(0xFF222222),
+                    title = "Key Concept",
+                    content = keyConcept,
+                    icon = Icons.Default.Psychology
+                )
 
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, NeutralGray, RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(containerColor = PureWhite),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Movie,
-                            contentDescription = "Example Icon",
-                            tint = SecondaryBlue,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text(
-                            text = "Real-world Example",
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = OnBackgroundColor
-                        )
-                        Text(
-                            text = realWorldExample,
-                            fontFamily = BeVietnamPro,
-                            fontSize = 14.sp,
-                            color = NeutralGrayDark
-                        )
-                    }
-                }
+                StickyNote(
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = Color(0xFF8BC804),
+                    pinColor = Color(0xFFFF3B30),
+                    title = "Real-world Example",
+                    content = realWorldExample,
+                    icon = Icons.Default.Movie
+                )
             }
         }
 
@@ -3144,9 +3377,10 @@ fun LessonScreen(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            Button(
+            NeumorphicButton(
                 onClick = { onNavigate(Screen.QUIZ) },
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                containerColor = PrimaryGreen,
+                contentColor = OnPrimary,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -3166,7 +3400,8 @@ fun LessonScreen(
                     )
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Arrow Forward"
+                        contentDescription = "Arrow Forward",
+                        tint = OnPrimary
                     )
                 }
             }
