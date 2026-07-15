@@ -1,0 +1,6 @@
+{
+  "name": "LearnTree AI",
+  "description": "An AI-powered gamified learning tree platform to generate personalized paths and interact with a smart tutor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
