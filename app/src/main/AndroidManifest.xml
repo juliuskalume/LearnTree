@@ -21,6 +21,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Deep link intent-filter for Supabase Auth redirect -->
+            <intent-filter android:label="LearnTree Auth Callback">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="learntree"
+                    android:host="auth-callback" />
+            </intent-filter>
         </activity>
     </application>
 

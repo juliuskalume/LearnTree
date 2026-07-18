@@ -92,7 +92,13 @@ object SupabaseAuthService {
             null
         } else {
             try {
-                val baseUrl = if (url.endsWith("/")) url else "$url/"
+                var cleanUrl = url.trim()
+                if (cleanUrl.endsWith("/rest/v1/")) {
+                    cleanUrl = cleanUrl.removeSuffix("/rest/v1/")
+                } else if (cleanUrl.endsWith("/rest/v1")) {
+                    cleanUrl = cleanUrl.removeSuffix("/rest/v1")
+                }
+                val baseUrl = if (cleanUrl.endsWith("/")) cleanUrl else "$cleanUrl/"
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 }
@@ -205,6 +211,18 @@ object SupabaseAuthService {
         _currentUser.value = null
         sharedPrefs?.edit()?.clear()?.apply()
         Log.d(TAG, "User logged out, session cleared")
+    }
+
+    fun onDeepLinkAuthenticated(token: String, user: SupabaseUser) {
+        accessToken = token
+        _currentUser.value = user
+        sharedPrefs?.edit()?.apply {
+            putString(KEY_ACCESS_TOKEN, token)
+            putString(KEY_USER_ID, user.id)
+            putString(KEY_USER_EMAIL, user.email)
+            apply()
+        }
+        Log.d(TAG, "Authenticated via deep link for user: ${user.email}")
     }
 
     private fun saveSession(data: SupabaseAuthResponse) {

@@ -331,10 +331,77 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleDeepLink(intent)
         setContent {
             MyApplicationTheme {
                 MainAppContainer()
             }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        handleDeepLink(intent)
+    }
+
+    private fun handleDeepLink(intent: android.content.Intent?) {
+        val data: android.net.Uri? = intent?.data
+        if (data != null && data.scheme == "learntree" && data.host == "auth-callback") {
+            android.util.Log.d("MainActivity", "Received deep link: $data")
+            var accessToken: String? = null
+
+            // 1. Check query parameters
+            try {
+                accessToken = data.getQueryParameter("access_token")
+            } catch (e: Exception) {
+                // ignore
+            }
+
+            // 2. If not found, check the fragment (hash)
+            val fragment = data.fragment
+            if (accessToken == null && fragment != null) {
+                val params = fragment.split("&")
+                for (param in params) {
+                    val keyValue = param.split("=")
+                    if (keyValue.size == 2) {
+                        val key = keyValue[0]
+                        val value = keyValue[1]
+                        if (key == "access_token") {
+                            accessToken = value
+                        }
+                    }
+                }
+            }
+
+            if (accessToken != null) {
+                val decodedUser = decodeJwt(accessToken)
+                if (decodedUser != null) {
+                    SupabaseAuthService.onDeepLinkAuthenticated(accessToken, decodedUser)
+                    android.widget.Toast.makeText(this, "Successfully authenticated!", android.widget.Toast.LENGTH_LONG).show()
+                } else {
+                    android.widget.Toast.makeText(this, "Failed to decode authentication details.", android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun decodeJwt(token: String): SupabaseUser? {
+        return try {
+            val parts = token.split(".")
+            if (parts.size < 2) return null
+            val payloadEncoded = parts[1]
+            val payloadBytes = android.util.Base64.decode(payloadEncoded, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP)
+            val payloadJson = String(payloadBytes, Charsets.UTF_8)
+            
+            val jsonObject = org.json.JSONObject(payloadJson)
+            val id = jsonObject.optString("sub", "")
+            val email = jsonObject.optString("email", "")
+            if (id.isNotEmpty()) {
+                SupabaseUser(id = id, email = if (email.isNotEmpty()) email else null)
+            } else null
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Failed to decode JWT token", e)
+            null
         }
     }
 }

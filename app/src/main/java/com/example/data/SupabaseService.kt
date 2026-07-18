@@ -51,8 +51,14 @@ object SupabaseService {
             null
         } else {
             try {
-                // Ensure base URL ends with a slash
-                val baseUrl = if (url.endsWith("/")) url else "$url/"
+                // Ensure base URL ends with a slash and does not contain /rest/v1
+                var cleanUrl = url.trim()
+                if (cleanUrl.endsWith("/rest/v1/")) {
+                    cleanUrl = cleanUrl.removeSuffix("/rest/v1/")
+                } else if (cleanUrl.endsWith("/rest/v1")) {
+                    cleanUrl = cleanUrl.removeSuffix("/rest/v1")
+                }
+                val baseUrl = if (cleanUrl.endsWith("/")) cleanUrl else "$cleanUrl/"
                 
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
